@@ -30,7 +30,7 @@ class CoinPriceListActivity : AppCompatActivity() {
         binding.rvCoinPriceList.adapter = adapter
         viewModel = ViewModelProviders.of(this)[CoinViewModel::class.java]
         viewModel.priceList.observe(this, Observer {
-            adapter.coinInfoList = it
+            adapter.submitList(it)
         })
     }
 }
