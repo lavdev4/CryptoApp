@@ -1,4 +1,4 @@
-package com.example.cryptoapp.adapters
+package com.example.cryptoapp.presentation
 
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cryptoapp.R
 import com.example.cryptoapp.databinding.ItemCoinInfoBinding
-import com.example.cryptoapp.pojo.CoinPriceInfo
+import com.example.cryptoapp.data.CoinPriceInfo
 import com.example.cryptoapp.utils.convertTimestampToTime
 import com.squareup.picasso.Picasso
 
