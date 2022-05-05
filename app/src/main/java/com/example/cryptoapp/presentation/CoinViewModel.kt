@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.example.cryptoapp.data.network.ApiFactory
 import com.example.cryptoapp.data.database.AppDatabase
 import com.example.cryptoapp.data.CoinPriceInfo
@@ -13,19 +14,16 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-class CoinViewModel(application: Application) : AndroidViewModel(application) {
+class CoinViewModel() : ViewModel() {
 
-    private val db = AppDatabase.getInstance(application)
     private val compositeDisposable = CompositeDisposable()
-
-    val priceList = db.coinPriceInfoDao().getPriceList()
-
-    fun getDetailInfo(fSym: String): LiveData<CoinPriceInfo> {
-        return db.coinPriceInfoDao().getPriceInfoAboutCoin(fSym)
-    }
 
     init {
         loadData()
+    }
+
+    fun getDetailInfo(fSym: String): LiveData<CoinPriceInfo> {
+        //getPriceInfoAboutCoin
     }
 
     private fun loadData() {

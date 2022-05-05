@@ -128,7 +128,6 @@ data class CoinPriceInfo(
     val imageUrl: String?
 ) {
 
-
     fun getFullImageUrl(): String {
         return BASE_IMAGE_URL + imageUrl
     }
