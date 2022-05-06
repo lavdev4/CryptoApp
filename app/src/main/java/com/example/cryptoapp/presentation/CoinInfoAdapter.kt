@@ -10,14 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cryptoapp.R
 import com.example.cryptoapp.databinding.ItemCoinInfoBinding
 import com.example.cryptoapp.data.network.model.CoinInfoDto
-import com.example.cryptoapp.utils.convertTimestampToTime
+import com.example.cryptoapp.domain.CoinInfoEntity
+
 import com.squareup.picasso.Picasso
 
 class CoinInfoAdapter(private val context: Context) :
-    ListAdapter<CoinInfoDto, CoinInfoAdapter.CoinInfoViewHolder>(CoinInfoDiffUtil()) {
+    ListAdapter<CoinInfoEntity, CoinInfoAdapter.CoinInfoViewHolder>(CoinInfoDiffUtil()) {
 
     interface OnCoinClickListener {
-        fun onCoinClick(coinPriceInfo: CoinInfoDto)
+        fun onCoinClick(coinPriceInfo: CoinInfoEntity)
     }
 
     var onCoinClickListener: OnCoinClickListener? = null
@@ -38,8 +39,8 @@ class CoinInfoAdapter(private val context: Context) :
                 val lastUpdateTemplate = context.resources.getString(R.string.last_update_template)
                 tvSymbols.text = String.format(symbolsTemplate, fromSymbol, toSymbol)
                 tvPrice.text = price
-                tvLastUpdate.text = String.format(lastUpdateTemplate, getFormattedTime())
-                Picasso.get().load(getFullImageUrl()).into(ivLogoCoin)
+                tvLastUpdate.text = String.format(lastUpdateTemplate, lastUpdate)
+                Picasso.get().load(imageUrl).into(ivLogoCoin)
                 itemView.setOnClickListener {
                     onCoinClickListener?.onCoinClick(this)
                 }
@@ -51,7 +52,7 @@ class CoinInfoAdapter(private val context: Context) :
         holder: CoinInfoViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty() && payloads[0] is Bundle) {
             val bundle = payloads[0] as Bundle
-            holder.update(bundle)
+            holder.update(bundle, context)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -65,36 +66,35 @@ class CoinInfoAdapter(private val context: Context) :
         val tvPrice = binding.tvPrice
         val tvLastUpdate = binding.tvLastUpdate
 
-        fun update(bundle: Bundle) {
+        fun update(bundle: Bundle, context: Context) {
             if (bundle.containsKey(CoinInfoDiffUtil.PRICE_KEY)) {
                 tvPrice.text = bundle.getString(CoinInfoDiffUtil.PRICE_KEY)
             }
             if (bundle.containsKey(CoinInfoDiffUtil.LAST_UPDATE_KEY)) {
-                //тут костыль. Исправить в дальнейшем
                 tvLastUpdate.text = String.format(
-                    "Время последнего обновления: %s",
-                    convertTimestampToTime(bundle.getLong(CoinInfoDiffUtil.LAST_UPDATE_KEY))
+                    context.resources.getString(R.string.last_update_template),
+                    bundle.getString(CoinInfoDiffUtil.LAST_UPDATE_KEY)
                 )
             }
         }
     }
 
-    class CoinInfoDiffUtil : DiffUtil.ItemCallback<CoinInfoDto>() {
+    class CoinInfoDiffUtil : DiffUtil.ItemCallback<CoinInfoEntity>() {
 
         companion object {
             const val PRICE_KEY = "new_price_value"
             const val LAST_UPDATE_KEY = "new_last_update_value"
         }
 
-        override fun areItemsTheSame(oldItem: CoinInfoDto, newItem: CoinInfoDto): Boolean {
+        override fun areItemsTheSame(oldItem: CoinInfoEntity, newItem: CoinInfoEntity): Boolean {
             return oldItem.fromSymbol == newItem.fromSymbol
         }
 
-        override fun areContentsTheSame(oldItem: CoinInfoDto, newItem: CoinInfoDto): Boolean {
+        override fun areContentsTheSame(oldItem: CoinInfoEntity, newItem: CoinInfoEntity): Boolean {
             return oldItem == newItem
         }
 
-        override fun getChangePayload(oldItem: CoinInfoDto, newItem: CoinInfoDto): Any? {
+        override fun getChangePayload(oldItem: CoinInfoEntity, newItem: CoinInfoEntity): Any? {
             if (
                 oldItem.toSymbol == newItem.toSymbol &&
                 oldItem.imageUrl == newItem.imageUrl
@@ -108,7 +108,7 @@ class CoinInfoAdapter(private val context: Context) :
                     oldItem.lastUpdate != null &&
                     newItem.lastUpdate != null
                 ) {
-                    payloads.putLong(LAST_UPDATE_KEY, newItem.lastUpdate)
+                    payloads.putString(LAST_UPDATE_KEY, newItem.lastUpdate)
                 }
                 return payloads
             }

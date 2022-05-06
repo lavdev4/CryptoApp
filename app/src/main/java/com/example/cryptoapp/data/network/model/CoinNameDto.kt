@@ -6,5 +6,5 @@ import com.google.gson.annotations.SerializedName
 data class CoinNameDto (
     @SerializedName("Name")
     @Expose
-    val names: String? = null
+    val name: String? = null
 )

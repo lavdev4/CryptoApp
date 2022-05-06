@@ -1,11 +1,13 @@
 package com.example.cryptoapp.domain
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import com.example.cryptoapp.data.RepositoryImpl
+import com.example.cryptoapp.data.network.model.CoinInfoDto
 
-class GetCoinInfoUseCase(var application: Application) {
+class GetCoinInfoUseCase(private var application: Application) {
 
-    fun getCoinInfo() {
-        RepositoryImpl.getInstance(application).getCoinInfo()
+    fun getCoinInfo(fSym: String): LiveData<CoinInfoEntity> {
+        return RepositoryImpl.getInstance(application).getCoinInfo(fSym)
     }
 }
