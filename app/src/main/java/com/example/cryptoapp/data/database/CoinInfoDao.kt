@@ -5,16 +5,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.cryptoapp.data.CoinPriceInfo
+import com.example.cryptoapp.data.network.model.CoinInfoDto
 
 @Dao
-interface CoinPriceInfoDao {
-    @Query("SELECT * FROM full_price_list")
-    fun getPriceList(): LiveData<List<CoinPriceInfo>>
-
+interface CoinInfoDao {
     @Query("SELECT * FROM full_price_list WHERE fromSymbol == :fSym LIMIT 1")
-    fun getPriceInfoAboutCoin(fSym: String): LiveData<CoinPriceInfo>
+    fun getCoinInfo(fSym: String): LiveData<CoinInfoDbModel>
+
+    @Query("SELECT * FROM full_price_list")
+    fun getCoinInfoList(): LiveData<List<CoinInfoDbModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPriceList(priceList: List<CoinPriceInfo>)
+    fun insertCoinInfoList(priceList: List<CoinInfoDbModel>)
 }

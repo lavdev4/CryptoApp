@@ -1,14 +1,11 @@
 package com.example.cryptoapp.presentation
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.cryptoapp.data.network.ApiFactory
-import com.example.cryptoapp.data.database.AppDatabase
-import com.example.cryptoapp.data.CoinPriceInfo
-import com.example.cryptoapp.data.network.CoinPriceInfoRawData
+import com.example.cryptoapp.data.network.model.CoinInfoDto
+import com.example.cryptoapp.data.network.model.CoinInfoJsonContainerDto
 import com.google.gson.Gson
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -18,21 +15,29 @@ class CoinViewModel() : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    init {
-        loadData()
+    val priceList = //usecase
+
+    fun getDetailInfo(fSym: String): LiveData<CoinInfoDto> {
+        //usecase
     }
 
-    fun getDetailInfo(fSym: String): LiveData<CoinPriceInfo> {
-        //getPriceInfoAboutCoin
+    init {
+        //usecase
     }
 
     private fun loadData() {
         val disposable = ApiFactory.apiService.getTopCoinsInfo(limit = 50)
-            .map { it.data?.map { it.coinInfo?.name }?.joinToString(",") }
+            //преобразование коллекции в одну строку со всем списком валют через ","
+            .map { it.coinNameContainers?.map { it.coinName?.names }?.joinToString(",") }
+            //получаем json по списку валют сформированному выше
             .flatMap { ApiFactory.apiService.getFullPriceList(fSyms = it) }
+            //парсим полученный json и получаем список объектов
             .map { getPriceListFromRawData(it) }
+            //задержка перед подпиской
             .delaySubscription(10, TimeUnit.SECONDS)
+            //повтор подписки заново
             .repeat()
+            //возвращает Flowable который переподписывается при сработке onError()
             .retry()
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -45,10 +50,10 @@ class CoinViewModel() : ViewModel() {
     }
 
     private fun getPriceListFromRawData(
-        coinPriceInfoRawData: CoinPriceInfoRawData
-    ): List<CoinPriceInfo> {
-        val result = ArrayList<CoinPriceInfo>()
-        val jsonObject = coinPriceInfoRawData.coinPriceInfoJsonObject ?: return result
+        coinInfoJsonContainerDto: CoinInfoJsonContainerDto
+    ): List<CoinInfoDto> {
+        val result = ArrayList<CoinInfoDto>()
+        val jsonObject = coinInfoJsonContainerDto.json ?: return result
         val coinKeySet = jsonObject.keySet()
         for (coinKey in coinKeySet) {
             val currencyJson = jsonObject.getAsJsonObject(coinKey)
@@ -56,7 +61,7 @@ class CoinViewModel() : ViewModel() {
             for (currencyKey in currencyKeySet) {
                 val priceInfo = Gson().fromJson(
                     currencyJson.getAsJsonObject(currencyKey),
-                    CoinPriceInfo::class.java
+                    CoinInfoDto::class.java
                 )
                 result.add(priceInfo)
             }

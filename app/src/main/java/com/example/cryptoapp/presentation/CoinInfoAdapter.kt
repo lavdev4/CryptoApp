@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cryptoapp.R
 import com.example.cryptoapp.databinding.ItemCoinInfoBinding
-import com.example.cryptoapp.data.CoinPriceInfo
+import com.example.cryptoapp.data.network.model.CoinInfoDto
 import com.example.cryptoapp.utils.convertTimestampToTime
 import com.squareup.picasso.Picasso
 
 class CoinInfoAdapter(private val context: Context) :
-    ListAdapter<CoinPriceInfo, CoinInfoAdapter.CoinInfoViewHolder>(CoinInfoDiffUtil()) {
+    ListAdapter<CoinInfoDto, CoinInfoAdapter.CoinInfoViewHolder>(CoinInfoDiffUtil()) {
 
     interface OnCoinClickListener {
-        fun onCoinClick(coinPriceInfo: CoinPriceInfo)
+        fun onCoinClick(coinPriceInfo: CoinInfoDto)
     }
 
     var onCoinClickListener: OnCoinClickListener? = null
@@ -79,22 +79,22 @@ class CoinInfoAdapter(private val context: Context) :
         }
     }
 
-    class CoinInfoDiffUtil : DiffUtil.ItemCallback<CoinPriceInfo>() {
+    class CoinInfoDiffUtil : DiffUtil.ItemCallback<CoinInfoDto>() {
 
         companion object {
             const val PRICE_KEY = "new_price_value"
             const val LAST_UPDATE_KEY = "new_last_update_value"
         }
 
-        override fun areItemsTheSame(oldItem: CoinPriceInfo, newItem: CoinPriceInfo): Boolean {
+        override fun areItemsTheSame(oldItem: CoinInfoDto, newItem: CoinInfoDto): Boolean {
             return oldItem.fromSymbol == newItem.fromSymbol
         }
 
-        override fun areContentsTheSame(oldItem: CoinPriceInfo, newItem: CoinPriceInfo): Boolean {
+        override fun areContentsTheSame(oldItem: CoinInfoDto, newItem: CoinInfoDto): Boolean {
             return oldItem == newItem
         }
 
-        override fun getChangePayload(oldItem: CoinPriceInfo, newItem: CoinPriceInfo): Any? {
+        override fun getChangePayload(oldItem: CoinInfoDto, newItem: CoinInfoDto): Any? {
             if (
                 oldItem.toSymbol == newItem.toSymbol &&
                 oldItem.imageUrl == newItem.imageUrl
