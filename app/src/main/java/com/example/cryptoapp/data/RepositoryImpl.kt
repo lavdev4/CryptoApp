@@ -42,18 +42,18 @@ class RepositoryImpl private constructor(application: Application) : Repository 
     }
 
     override fun loadData() {
-        val disposable = ApiFactory.apiService.getTopCoinsInfo(limit = 50)
+        val disposable = apiService.getTopCoinsInfo(limit = 50)
             //преобразование коллекции в одну строку со всем списком валют через ","
             .map { coinNamesList -> coinNamesList.coinNameContainers?.map {
                     it.coinName?.name
                 }?.joinToString(",")
             }
             //получаем json по списку валют сформированному выше
-            .flatMap { ApiFactory.apiService.getFullPriceList(fSyms = it) }
+            .flatMap { apiService.getFullPriceList(fSyms = it) }
             //парсим полученный json и получаем список объектов
             .map { coinMapper.mapCoinInfoJsonToEntity(it) }
             //задержка перед подпиской
-            .delaySubscription(10, TimeUnit.SECONDS)
+            .delaySubscription(3, TimeUnit.SECONDS)
             //повтор подписки заново
             .repeat()
             //возвращает Flowable который переподписывается при сработке onError()
