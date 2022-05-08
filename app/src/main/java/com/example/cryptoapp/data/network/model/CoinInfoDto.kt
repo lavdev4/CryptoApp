@@ -1,8 +1,5 @@
 package com.example.cryptoapp.data.network.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.example.cryptoapp.data.network.ApiFactory.BASE_IMAGE_URL
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
