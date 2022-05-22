@@ -9,6 +9,7 @@ import com.example.cryptoapp.data.network.ApiFactory
 import com.example.cryptoapp.domain.CoinInfoEntity
 import com.example.cryptoapp.domain.Repository
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 class RepositoryImpl private constructor(application: Application) : Repository {
@@ -41,29 +42,20 @@ class RepositoryImpl private constructor(application: Application) : Repository 
         }
     }
 
-    override fun loadData() {
-        val disposable = apiService.getTopCoinsInfo(limit = 50)
-            //преобразование коллекции в одну строку со всем списком валют через ","
-            .map { coinNamesList -> coinNamesList.coinNameContainers?.map {
-                    it.coinName?.name
-                }?.joinToString(",")
+    override suspend fun loadData() {
+        while (true) {
+            try {
+                apiService.getTopCoinsInfo(limit = 50).coinNameContainers
+                    ?.let { coinNameContainer ->
+                        coinNameContainer.map { it.coinName?.name }.joinToString(",")
+                            .let { apiService.getFullPriceList(fSyms = it) }
+                            .let { coinMapper.mapCoinInfoJsonToEntity(it) }
+                            .let { dao.insertCoinInfoList(coinMapper.mapCoinInfoDtoToDbModel(it)) }
+                    }
+            } catch (e: Exception) {
+
             }
-            //получаем json по списку валют сформированному выше
-            .flatMap { apiService.getFullPriceList(fSyms = it) }
-            //парсим полученный json и получаем список объектов
-            .map { coinMapper.mapCoinInfoJsonToEntity(it) }
-            //задержка перед подпиской
-            .delaySubscription(3, TimeUnit.SECONDS)
-            //повтор подписки заново
-            .repeat()
-            //возвращает Flowable который переподписывается при сработке onError()
-            .retry()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                dao.insertCoinInfoList(coinMapper.mapCoinInfoDtoToDbModel(it))
-                Log.d("TEST_OF_LOADING_DATA", "Success: $it")
-            }, {
-                Log.d("TEST_OF_LOADING_DATA", "Failure: ${it.message}")
-            })
+            delay(10000)
+        }
     }
 }

@@ -15,5 +15,5 @@ interface CoinInfoDao {
     fun getCoinInfoList(): LiveData<List<CoinInfoDbModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCoinInfoList(priceList: List<CoinInfoDbModel>)
+    suspend fun insertCoinInfoList(priceList: List<CoinInfoDbModel>)
 }
