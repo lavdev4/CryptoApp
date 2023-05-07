@@ -9,9 +9,9 @@ import com.google.gson.Gson
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+import javax.inject.Inject
 
-class CoinMapper {
+class CoinMapper @Inject constructor() {
 
     fun mapCoinInfoDbModelToEntity(coinInfoDbModel: CoinInfoDbModel): CoinInfoEntity {
         val formatImageUrl = ApiFactory.BASE_IMAGE_URL + coinInfoDbModel.imageUrl

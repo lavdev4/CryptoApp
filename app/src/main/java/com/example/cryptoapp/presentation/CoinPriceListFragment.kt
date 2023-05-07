@@ -1,5 +1,6 @@
 package com.example.cryptoapp.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,15 +10,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.cryptoapp.databinding.FragmentCoinPriceListBinding
 import com.example.cryptoapp.domain.CoinInfoEntity
-import java.lang.RuntimeException
+import javax.inject.Inject
 
 class CoinPriceListFragment : Fragment() {
 
-    private lateinit var viewModel: CoinViewModel
+    @Inject
+    lateinit var viewModelFactory: AppViewModelFactory
+    private lateinit var viewModel: CoinPriceListViewModel
     private lateinit var onFragmentCallListener: OnFragmentCallListener
     private var _binding: FragmentCoinPriceListBinding? = null
     private val binding: FragmentCoinPriceListBinding
         get() = _binding ?: throw RuntimeException("FragmentCoinPriceListBinding is null")
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity() as MainActivity).mainActivitySubcomponent.inject(this)
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[CoinPriceListViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +53,6 @@ class CoinPriceListFragment : Fragment() {
         }
         binding.rvCoinPriceList.adapter = adapter
 
-        viewModel = ViewModelProvider(this)[CoinViewModel::class.java]
         viewModel.priceList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }

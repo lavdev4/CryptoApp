@@ -1,35 +1,21 @@
 package com.example.cryptoapp.data
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.work.*
-import com.example.cryptoapp.data.database.AppDatabase
-import com.example.cryptoapp.data.network.ApiFactory
+import com.example.cryptoapp.data.database.CoinInfoDao
 import com.example.cryptoapp.data.network.LoadDataWorker
+import com.example.cryptoapp.di.annotations.ApplicationScope
 import com.example.cryptoapp.domain.CoinInfoEntity
 import com.example.cryptoapp.domain.Repository
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class RepositoryImpl private constructor(private val application: Application) : Repository {
-
-    private val dao = AppDatabase.getInstance(application).coinInfoDao()
-    private val coinMapper = CoinMapper()
-
-    companion object {
-        private val repository: RepositoryImpl? = null
-        private val LOCK = Any()
-
-        fun getInstance(application: Application): RepositoryImpl {
-            synchronized(LOCK) {
-                repository?.let { return it }
-                return RepositoryImpl(application)
-            }
-        }
-    }
+@ApplicationScope
+class RepositoryImpl @Inject constructor(
+    private val dao: CoinInfoDao,
+    private val workManager: WorkManager,
+    private val coinMapper: CoinMapper
+) : Repository {
 
     override fun getCoinInfo(fSym: String): LiveData<CoinInfoEntity> {
         return Transformations.map(dao.getCoinInfo(fSym)) {
@@ -43,8 +29,7 @@ class RepositoryImpl private constructor(private val application: Application) :
         }
     }
 
-    override suspend fun loadData() {
-        val workManager = WorkManager.getInstance(application)
+    override fun loadData() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()

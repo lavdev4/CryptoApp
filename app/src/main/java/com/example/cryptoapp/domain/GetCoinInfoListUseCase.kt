@@ -1,12 +1,10 @@
 package com.example.cryptoapp.domain
 
-import android.app.Application
-import androidx.lifecycle.LiveData
-import com.example.cryptoapp.data.RepositoryImpl
+import javax.inject.Inject
 
-class GetCoinInfoListUseCase(private val application: Application) {
+class GetCoinInfoListUseCase @Inject constructor(
+    private val repository: Repository
+) {
 
-    fun getCoinInfoList(): LiveData<List<CoinInfoEntity>> {
-        return RepositoryImpl.getInstance(application).getCoinInfoList()
-    }
+    operator fun invoke() = repository.getCoinInfoList()
 }

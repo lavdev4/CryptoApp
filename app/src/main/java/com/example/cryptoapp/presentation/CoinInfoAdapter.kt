@@ -56,7 +56,7 @@ class CoinInfoAdapter(private val context: Context) :
         }
     }
 
-    class CoinInfoViewHolder(binding: ItemCoinInfoBinding) :
+     class CoinInfoViewHolder(binding: ItemCoinInfoBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         val ivLogoCoin = binding.ivLogoCoin

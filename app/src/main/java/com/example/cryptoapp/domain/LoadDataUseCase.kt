@@ -1,11 +1,10 @@
 package com.example.cryptoapp.domain
 
-import android.app.Application
-import com.example.cryptoapp.data.RepositoryImpl
+import javax.inject.Inject
 
-class LoadDataUseCase(private val application: Application) {
+class LoadDataUseCase @Inject constructor(
+    private val repository: Repository
+) {
 
-    suspend fun loadData() {
-        RepositoryImpl.getInstance(application).loadData()
-    }
+    operator fun invoke() = repository.loadData()
 }
