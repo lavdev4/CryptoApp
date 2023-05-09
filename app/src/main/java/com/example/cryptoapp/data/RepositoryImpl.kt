@@ -1,7 +1,7 @@
 package com.example.cryptoapp.data
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.work.*
 import com.example.cryptoapp.data.database.CoinInfoDao
 import com.example.cryptoapp.data.network.LoadDataWorker
@@ -18,13 +18,13 @@ class RepositoryImpl @Inject constructor(
 ) : Repository {
 
     override fun getCoinInfo(fSym: String): LiveData<CoinInfoEntity> {
-        return Transformations.map(dao.getCoinInfo(fSym)) {
+        return dao.getCoinInfo(fSym).map {
             coinMapper.mapCoinInfoDbModelToEntity(it)
         }
     }
 
     override fun getCoinInfoList(): LiveData<List<CoinInfoEntity>> {
-        return Transformations.map(dao.getCoinInfoList()) { coinInfoList ->
+        return dao.getCoinInfoList().map { coinInfoList ->
             coinInfoList.map { coinMapper.mapCoinInfoDbModelToEntity(it) }
         }
     }
