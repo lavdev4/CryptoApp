@@ -1,9 +1,9 @@
-package com.example.cryptoapp.di
+package com.example.cryptoapp.di.modules
 
 import androidx.lifecycle.ViewModel
 import com.example.cryptoapp.di.annotations.ViewModelKey
-import com.example.cryptoapp.presentation.CoinDetailViewModel
-import com.example.cryptoapp.presentation.CoinPriceListViewModel
+import com.example.cryptoapp.presentation.viewmodels.CoinDetailViewModel
+import com.example.cryptoapp.presentation.viewmodels.CoinPriceListViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap

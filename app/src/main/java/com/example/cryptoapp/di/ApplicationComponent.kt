@@ -2,6 +2,9 @@ package com.example.cryptoapp.di
 
 import android.content.Context
 import com.example.cryptoapp.di.annotations.ApplicationScope
+import com.example.cryptoapp.di.modules.DataModule
+import com.example.cryptoapp.di.modules.ViewModelModule
+import com.example.cryptoapp.di.modules.WorkerModule
 import com.example.cryptoapp.presentation.CoinApplication
 import dagger.BindsInstance
 import dagger.Component

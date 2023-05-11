@@ -1,4 +1,4 @@
-package com.example.cryptoapp.di
+package com.example.cryptoapp.di.modules
 
 import android.content.Context
 import androidx.work.WorkManager

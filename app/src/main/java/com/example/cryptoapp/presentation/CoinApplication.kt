@@ -2,7 +2,7 @@ package com.example.cryptoapp.presentation
 
 import android.app.Application
 import androidx.work.Configuration
-import com.example.cryptoapp.data.network.AppWorkerFactory
+import com.example.cryptoapp.data.workers.AppWorkerFactory
 import com.example.cryptoapp.di.ApplicationComponent
 import com.example.cryptoapp.di.DaggerApplicationComponent
 import javax.inject.Inject
@@ -25,5 +25,9 @@ class CoinApplication : Application(), Configuration.Provider {
         return Configuration.Builder()
             .setWorkerFactory(appWorkerFactory)
             .build()
+    }
+
+    companion object {
+        const val LOG_DEBUG_TAG = "Application debug"
     }
 }

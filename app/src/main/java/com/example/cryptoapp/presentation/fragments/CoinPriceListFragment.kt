@@ -1,4 +1,4 @@
-package com.example.cryptoapp.presentation
+package com.example.cryptoapp.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.cryptoapp.databinding.FragmentCoinPriceListBinding
-import com.example.cryptoapp.domain.CoinInfoEntity
+import com.example.cryptoapp.domain.entities.CoinInfoEntity
+import com.example.cryptoapp.presentation.CoinApplication.Companion.LOG_DEBUG_TAG
+import com.example.cryptoapp.presentation.MainActivity
+import com.example.cryptoapp.presentation.adapters.PriceListAdapter
+import com.example.cryptoapp.presentation.viewmodels.AppViewModelFactory
+import com.example.cryptoapp.presentation.viewmodels.CoinPriceListViewModel
 import javax.inject.Inject
 
 class CoinPriceListFragment : Fragment() {
@@ -25,6 +30,11 @@ class CoinPriceListFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity() as MainActivity).mainActivitySubcomponent.inject(this)
+
+        if (requireActivity() is OnFragmentCallListener) {
+            onFragmentCallListener = requireActivity() as OnFragmentCallListener
+        } else throw RuntimeException("Parent activity doesn't implement OnFragmentCallListener interface.")
+
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[CoinPriceListViewModel::class.java]
     }
 
@@ -33,22 +43,20 @@ class CoinPriceListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d("Created fragment: ", "price list")
+        Log.d(LOG_DEBUG_TAG, "Created CoinPriceListFragment")
         _binding = FragmentCoinPriceListBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = CoinInfoAdapter(requireContext())
-        adapter.onCoinClickListener = object : CoinInfoAdapter.OnCoinClickListener {
-            override fun onCoinClick(coinPriceInfo: CoinInfoEntity) {
-                if (requireActivity() is OnFragmentCallListener) {
-                    val fragmentToShow = CoinDetailFragment()
-                    fragmentToShow.arguments = CoinDetailFragment.newBundle(coinPriceInfo.fromSymbol)
-                    onFragmentCallListener = requireActivity() as OnFragmentCallListener
-                    onFragmentCallListener.showFragment(fragmentToShow)
-                } else throw RuntimeException("Parent activity doesn't implement OnFragmentCallListener interface.")
+
+        val adapter = PriceListAdapter(requireContext())
+        adapter.onItemClickListener = object : PriceListAdapter.OnItemClickListener {
+            override fun onItemClick(coinInfo: CoinInfoEntity) {
+                CoinDetailFragment().apply {
+                    arguments = CoinDetailFragment.createArguments(coinInfo.fromSymbol)
+                }.also { onFragmentCallListener.showFragment(it) }
             }
         }
         binding.rvCoinPriceList.adapter = adapter

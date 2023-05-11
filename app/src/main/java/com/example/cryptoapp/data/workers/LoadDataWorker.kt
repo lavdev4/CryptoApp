@@ -1,12 +1,14 @@
-package com.example.cryptoapp.data.network
+package com.example.cryptoapp.data.workers
 
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
-import com.example.cryptoapp.data.CoinMapper
 import com.example.cryptoapp.data.database.CoinInfoDao
+import com.example.cryptoapp.data.mappers.CoinMapper
+import com.example.cryptoapp.data.network.ApiService
+import com.example.cryptoapp.presentation.CoinApplication.Companion.LOG_DEBUG_TAG
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -19,27 +21,29 @@ class LoadDataWorker private constructor(
 ) : CoroutineWorker(applicationContext, workerParams) {
 
     companion object {
-        const val workerTag = "LoadDataWorker"
+        const val WORKER_TAG = "LoadDataWorker"
+        const val REQUEST_REPEAT_TIMEOUT = 10000L
     }
 
     override suspend fun doWork(): Result {
-        Log.d("Worker hash code: ", this.id.toString())
-        Log.d("Run attempt count - ", runAttemptCount.toString())
+        Log.d(LOG_DEBUG_TAG, "Work request (id: ${this.id}) run attempt #$runAttemptCount")
         while (true) {
             try {
                 apiService.getTopCoinsInfo(limit = 50).coinNameContainers
-                    ?.let { coinNameContainer ->
-                        coinNameContainer.map { it.coinName?.name }.joinToString(",")
+                    ?.let { coinNameContainers ->
+                        coinNameContainers.map { it.coinName?.name }.joinToString(",")
                             .let { apiService.getFullPriceList(fSyms = it) }
-                            .let { mapper.mapCoinInfoJsonToEntity(it) }
-                            .let { dao.insertCoinInfoList(mapper.mapCoinInfoDtoToDbModel(it)) }
+                            .let { mapper.mapCoinInfoJsonToDto(it) }
+                            .let {
+                                Log.d(LOG_DEBUG_TAG, "Network request succeeded with ${it.size} items.")
+                                dao.insertCoinInfoList(mapper.mapCoinInfoDtoToDbModel(it))
+                            }
                     }
-                Log.d("Network request ", "succeeded.")
             } catch (exception: Exception) {
-                Log.d("Network request ", "failed! /n", exception)
+                Log.d(LOG_DEBUG_TAG, "Network request failed! /n Exception: $exception")
                 Result.failure()
             }
-            delay(10000)
+            delay(REQUEST_REPEAT_TIMEOUT)
         }
     }
 

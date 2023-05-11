@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.work.*
 import com.example.cryptoapp.data.database.CoinInfoDao
-import com.example.cryptoapp.data.network.LoadDataWorker
+import com.example.cryptoapp.data.mappers.CoinMapper
+import com.example.cryptoapp.data.workers.LoadDataWorker
 import com.example.cryptoapp.di.annotations.ApplicationScope
-import com.example.cryptoapp.domain.CoinInfoEntity
 import com.example.cryptoapp.domain.Repository
+import com.example.cryptoapp.domain.entities.CoinInfoEntity
 import javax.inject.Inject
 
 @ApplicationScope
@@ -17,8 +18,8 @@ class RepositoryImpl @Inject constructor(
     private val coinMapper: CoinMapper
 ) : Repository {
 
-    override fun getCoinInfo(fSym: String): LiveData<CoinInfoEntity> {
-        return dao.getCoinInfo(fSym).map {
+    override fun getCoinInfo(coinName: String): LiveData<CoinInfoEntity> {
+        return dao.getCoinInfo(coinName).map {
             coinMapper.mapCoinInfoDbModelToEntity(it)
         }
     }
@@ -37,7 +38,7 @@ class RepositoryImpl @Inject constructor(
             .setConstraints(constraints)
             .build()
         workManager.enqueueUniqueWork(
-            LoadDataWorker.workerTag,
+            LoadDataWorker.WORKER_TAG,
             ExistingWorkPolicy.REPLACE,
             workRequest)
     }

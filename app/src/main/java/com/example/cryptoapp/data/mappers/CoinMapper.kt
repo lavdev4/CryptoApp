@@ -1,10 +1,10 @@
-package com.example.cryptoapp.data
+package com.example.cryptoapp.data.mappers
 
 import com.example.cryptoapp.data.database.CoinInfoDbModel
 import com.example.cryptoapp.data.network.ApiFactory
 import com.example.cryptoapp.data.network.model.CoinInfoDto
 import com.example.cryptoapp.data.network.model.CoinInfoJsonContainerDto
-import com.example.cryptoapp.domain.CoinInfoEntity
+import com.example.cryptoapp.domain.entities.CoinInfoEntity
 import com.google.gson.Gson
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -14,7 +14,6 @@ import javax.inject.Inject
 class CoinMapper @Inject constructor() {
 
     fun mapCoinInfoDbModelToEntity(coinInfoDbModel: CoinInfoDbModel): CoinInfoEntity {
-        val formatImageUrl = ApiFactory.BASE_IMAGE_URL + coinInfoDbModel.imageUrl
         return CoinInfoEntity(
             fromSymbol = coinInfoDbModel.fromSymbol,
             toSymbol = coinInfoDbModel.toSymbol,
@@ -23,7 +22,7 @@ class CoinMapper @Inject constructor() {
             highDay = coinInfoDbModel.highDay,
             lowDay = coinInfoDbModel.lowDay,
             lastMarket = coinInfoDbModel.lastMarket,
-            imageUrl = formatImageUrl
+            imageUrl = convertImageUrlToFullImageUrl(coinInfoDbModel.imageUrl)
         )
     }
 
@@ -42,7 +41,7 @@ class CoinMapper @Inject constructor() {
         }
     }
 
-    fun mapCoinInfoJsonToEntity(
+    fun mapCoinInfoJsonToDto(
         coinInfoJsonContainerDto: CoinInfoJsonContainerDto
     ): List<CoinInfoDto> {
         val result = ArrayList<CoinInfoDto>()
@@ -70,5 +69,9 @@ class CoinMapper @Inject constructor() {
         val sdf = SimpleDateFormat(pattern, Locale.getDefault())
         sdf.timeZone = TimeZone.getDefault()
         return sdf.format(date)
+    }
+
+    private fun convertImageUrlToFullImageUrl(url: String?): String {
+        return ApiFactory.BASE_IMAGE_URL + url
     }
 }

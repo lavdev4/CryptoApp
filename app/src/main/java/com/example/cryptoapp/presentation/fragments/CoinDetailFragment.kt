@@ -1,4 +1,4 @@
-package com.example.cryptoapp.presentation
+package com.example.cryptoapp.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -9,6 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.cryptoapp.databinding.FragmentCoinDetailBinding
+import com.example.cryptoapp.presentation.CoinApplication.Companion.LOG_DEBUG_TAG
+import com.example.cryptoapp.presentation.MainActivity
+import com.example.cryptoapp.presentation.viewmodels.AppViewModelFactory
+import com.example.cryptoapp.presentation.viewmodels.CoinDetailViewModel
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
@@ -24,6 +28,7 @@ class CoinDetailFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity() as MainActivity).mainActivitySubcomponent.inject(this)
+
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[CoinDetailViewModel::class.java]
     }
 
@@ -32,7 +37,7 @@ class CoinDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d("Created fragment: ", "detail")
+        Log.d(LOG_DEBUG_TAG, "Created CoinDetailFragment")
         _binding = FragmentCoinDetailBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -40,13 +45,12 @@ class CoinDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (arguments == null || !requireArguments().containsKey(EXTRA_FROM_SYMBOL)) {
+        if (arguments == null || !requireArguments().containsKey(COIN_TO_SHOW)) {
             parentFragmentManager.popBackStack()
             return
         }
-        val fromSymbol = arguments?.getString(EXTRA_FROM_SYMBOL)
-        fromSymbol?.let { _fromSymbol ->
-            viewModel.getDetailInfo(_fromSymbol).observe(viewLifecycleOwner) {
+        arguments?.getString(COIN_TO_SHOW)?.let { coin ->
+            viewModel.getDetailInfo(coin).observe(viewLifecycleOwner) {
                 binding.tvPrice.text = it.price
                 binding.tvMinPrice.text = it.lowDay
                 binding.tvMaxPrice.text = it.highDay
@@ -65,11 +69,11 @@ class CoinDetailFragment : Fragment() {
     }
 
     companion object {
-        private const val EXTRA_FROM_SYMBOL = "fSym"
+        private const val COIN_TO_SHOW = "fSym"
 
-        fun newBundle(fromSymbol: String): Bundle {
+        fun createArguments(coinToShow: String): Bundle {
             val bundle = Bundle()
-            bundle.putString(EXTRA_FROM_SYMBOL, fromSymbol)
+            bundle.putString(COIN_TO_SHOW, coinToShow)
             return bundle
         }
     }

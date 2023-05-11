@@ -8,7 +8,7 @@
         android:id="@+id/leftFragmentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:name="com.example.cryptoapp.presentation.CoinPriceListFragment"
+        android:name="com.example.cryptoapp.presentation.fragments.CoinPriceListFragment"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/rightFragmentContainer"

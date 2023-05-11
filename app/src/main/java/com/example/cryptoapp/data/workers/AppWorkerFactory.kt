@@ -1,4 +1,4 @@
-package com.example.cryptoapp.data.network
+package com.example.cryptoapp.data.workers
 
 import android.content.Context
 import androidx.work.ListenableWorker

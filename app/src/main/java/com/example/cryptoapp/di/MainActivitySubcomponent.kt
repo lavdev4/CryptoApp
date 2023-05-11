@@ -1,8 +1,8 @@
 package com.example.cryptoapp.di
 
 import com.example.cryptoapp.di.annotations.MainActivityScope
-import com.example.cryptoapp.presentation.CoinDetailFragment
-import com.example.cryptoapp.presentation.CoinPriceListFragment
+import com.example.cryptoapp.presentation.fragments.CoinDetailFragment
+import com.example.cryptoapp.presentation.fragments.CoinPriceListFragment
 import dagger.Subcomponent
 
 @MainActivityScope

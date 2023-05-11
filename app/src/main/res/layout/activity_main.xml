@@ -7,7 +7,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
-        android:name="com.example.cryptoapp.presentation.CoinPriceListFragment"
+        android:name="com.example.cryptoapp.presentation.fragments.CoinPriceListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>

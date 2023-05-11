@@ -1,8 +1,8 @@
-package com.example.cryptoapp.presentation
+package com.example.cryptoapp.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.example.cryptoapp.domain.GetCoinInfoListUseCase
-import com.example.cryptoapp.domain.LoadDataUseCase
+import com.example.cryptoapp.domain.usecases.GetCoinInfoListUseCase
+import com.example.cryptoapp.domain.usecases.LoadDataUseCase
 import javax.inject.Inject
 
 class CoinPriceListViewModel @Inject constructor(
