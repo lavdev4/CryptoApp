@@ -20,7 +20,7 @@ abstract class DataModule {
 
     companion object {
         @Provides
-        fun provideAppDatabase(context: Context): CoinInfoDao {
+        fun provideDao(context: Context): CoinInfoDao {
             return AppDatabase.getInstance(context).coinInfoDao()
         }
 

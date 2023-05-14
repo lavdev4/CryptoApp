@@ -23,22 +23,24 @@ class LoadDataWorker private constructor(
     companion object {
         const val WORKER_TAG = "LoadDataWorker"
         const val REQUEST_REPEAT_TIMEOUT = 10000L
+        const val INITIAL_DELAY = 10000L
     }
 
     override suspend fun doWork(): Result {
         Log.d(LOG_DEBUG_TAG, "Work request (id: ${this.id}) run attempt #$runAttemptCount")
+        delay(INITIAL_DELAY)
         while (true) {
             try {
-                apiService.getTopCoinsInfo(limit = 50).coinNameContainers
-                    ?.let { coinNameContainers ->
-                        coinNameContainers.map { it.coinName?.name }.joinToString(",")
-                            .let { apiService.getFullPriceList(fSyms = it) }
-                            .let { mapper.mapCoinInfoJsonToDto(it) }
-                            .let {
-                                Log.d(LOG_DEBUG_TAG, "Network request succeeded with ${it.size} items.")
-                                dao.insertCoinInfoList(mapper.mapCoinInfoDtoToDbModel(it))
-                            }
-                    }
+//                apiService.getTopCoinsInfo(limit = 50).coinNameContainers
+//                    ?.let { coinNameContainers ->
+//                        coinNameContainers.map { it.coinName?.name }.joinToString(",")
+//                            .let { apiService.getFullPriceList(fSyms = it) }
+//                            .let { mapper.mapCoinInfoJsonToDto(it) }
+//                            .let {
+//                                Log.d(LOG_DEBUG_TAG, "Network request succeeded with ${it.size} items.")
+//                                dao.insertCoinInfoList(mapper.mapCoinInfoDtoToDbModel(it))
+//                            }
+//                    }
             } catch (exception: Exception) {
                 Log.d(LOG_DEBUG_TAG, "Network request failed! /n Exception: $exception")
                 Result.failure()

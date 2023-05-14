@@ -1,6 +1,7 @@
 package com.example.cryptoapp.data.database
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -12,8 +13,11 @@ interface CoinInfoDao {
     fun getCoinInfo(fSym: String): LiveData<CoinInfoDbModel>
 
     @Query("SELECT * FROM full_price_list")
-    fun getCoinInfoList(): LiveData<List<CoinInfoDbModel>>
+    fun getCoinInfoList(): PagingSource<Int, CoinInfoDbModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCoinInfoList(priceList: List<CoinInfoDbModel>)
+
+    @Query("DELETE FROM full_price_list")
+    suspend fun deleteAllData()
 }

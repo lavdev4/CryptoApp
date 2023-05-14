@@ -28,6 +28,6 @@ class CoinApplication : Application(), Configuration.Provider {
     }
 
     companion object {
-        const val LOG_DEBUG_TAG = "Application debug"
+        const val LOG_DEBUG_TAG = "ApplicationDebug"
     }
 }

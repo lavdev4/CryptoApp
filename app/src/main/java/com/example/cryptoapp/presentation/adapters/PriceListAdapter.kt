@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cryptoapp.R
 import com.example.cryptoapp.databinding.ItemCoinInfoBinding
@@ -13,7 +13,7 @@ import com.example.cryptoapp.domain.entities.CoinInfoEntity
 import com.squareup.picasso.Picasso
 
 class PriceListAdapter(private val context: Context) :
-    ListAdapter<CoinInfoEntity, PriceListAdapter.PriceListViewHolder>(PriceListDiffUtil()) {
+    PagingDataAdapter<CoinInfoEntity, PriceListAdapter.PriceListViewHolder>(PriceListDiffUtil()) {
 
     var onItemClickListener: OnItemClickListener? = null
 
@@ -27,7 +27,7 @@ class PriceListAdapter(private val context: Context) :
     }
 
     override fun onBindViewHolder(holder: PriceListViewHolder, position: Int) {
-        val item = currentList[position]
+        val item = getItem(position)
         holder.setData(item)
     }
 
@@ -61,14 +61,18 @@ class PriceListAdapter(private val context: Context) :
         private val tvPrice = binding.tvPrice
         private val tvLastUpdate = binding.tvLastUpdate
 
-         fun setData(coinInfo: CoinInfoEntity) {
-             with(coinInfo) {
+         fun setData(coinInfo: CoinInfoEntity?) {
+             coinInfo?.let { data ->
                  val symbolsTemplate = context.resources.getString(R.string.symbols_template)
                  val lastUpdateTemplate = context.resources.getString(R.string.last_update_template)
-                 tvSymbols.text = String.format(symbolsTemplate, fromSymbol, toSymbol)
-                 tvPrice.text = price
-                 tvLastUpdate.text = String.format(lastUpdateTemplate, lastUpdate)
-                 Picasso.get().load(imageUrl).into(ivLogoCoin)
+                 tvSymbols.text = String.format(
+                     symbolsTemplate,
+                     data.fromSymbol,
+                     data.toSymbol
+                 )
+                 tvPrice.text = data.price
+                 tvLastUpdate.text = String.format(lastUpdateTemplate, data.lastUpdate)
+                 Picasso.get().load(data.imageUrl).into(ivLogoCoin)
              }
          }
 
@@ -79,7 +83,7 @@ class PriceListAdapter(private val context: Context) :
 
         fun setOnItemClickListener() {
             itemView.setOnClickListener {
-                onItemClickListener?.onItemClick(currentList[absoluteAdapterPosition])
+                getItem(absoluteAdapterPosition)?.let { onItemClickListener?.onItemClick(it) }
             }
         }
     }
