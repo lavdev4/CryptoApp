@@ -15,6 +15,9 @@ interface CoinInfoDao {
     @Query("SELECT * FROM full_price_list")
     fun getCoinInfoList(): PagingSource<Int, CoinInfoDbModel>
 
+    @Query("SELECT fromSymbol FROM full_price_list ORDER BY rowid")
+    suspend fun getCoinNames(): List<String>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCoinInfoList(priceList: List<CoinInfoDbModel>)
 
