@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.cryptoapp.databinding.FragmentCoinPriceListBinding
 import com.example.cryptoapp.domain.entities.CoinInfoEntity
@@ -24,21 +24,20 @@ class CoinPriceListFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: AppViewModelFactory
-    private lateinit var viewModel: CoinPriceListViewModel
-    private lateinit var onFragmentCallListener: OnFragmentCallListener
+    private val viewModel by viewModels<CoinPriceListViewModel> { viewModelFactory }
+    private lateinit var detailFragmentCallListener: DetailFragmentCallListener
     private var _binding: FragmentCoinPriceListBinding? = null
     private val binding: FragmentCoinPriceListBinding
         get() = _binding ?: throw RuntimeException("FragmentCoinPriceListBinding is null")
 
     override fun onAttach(context: Context) {
+        Log.d(LOG_DEBUG_TAG, "CoinPriceListFragment onAttach")
         super.onAttach(context)
         (requireActivity() as MainActivity).mainActivitySubcomponent.inject(this)
 
-        if (requireActivity() is OnFragmentCallListener) {
-            onFragmentCallListener = requireActivity() as OnFragmentCallListener
+        if (requireActivity() is DetailFragmentCallListener) {
+            detailFragmentCallListener = requireActivity() as DetailFragmentCallListener
         } else throw RuntimeException("Parent activity doesn't implement OnFragmentCallListener interface.")
-
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[CoinPriceListViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -47,7 +46,7 @@ class CoinPriceListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         Log.d(LOG_DEBUG_TAG, "Created CoinPriceListFragment")
-        _binding = FragmentCoinPriceListBinding.inflate(layoutInflater)
+        _binding = FragmentCoinPriceListBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -60,11 +59,9 @@ class CoinPriceListFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.priceList.collectLatest {
-                Log.d(LOG_DEBUG_TAG, "Adapter update")
                 adapter.submitData(it)
+                Log.d(LOG_DEBUG_TAG, "Adapter update")
             }
-//            delay(3000)
-//            adapter.refresh()
         }
     }
 
@@ -76,12 +73,16 @@ class CoinPriceListFragment : Fragment() {
     private fun setupItemClickListener(): PriceListAdapter.OnItemClickListener {
         return object : PriceListAdapter.OnItemClickListener {
             override fun onItemClick(coinInfo: CoinInfoEntity) {
-                CoinDetailFragment().apply {
-                    arguments = CoinDetailFragment.createArguments(coinInfo.fromSymbol)
-                }.also { onFragmentCallListener.showFragment(it) }
+                arguments = CoinDetailFragment.createArguments(coinInfo.fromSymbol)
+                detailFragmentCallListener.showDetailFragment(
+                    CoinDetailFragment::class.java,
+                    arguments
+                )
             }
         }
     }
 
-    interface OnFragmentCallListener { fun showFragment(fragmentToShow: Fragment) }
+    interface DetailFragmentCallListener {
+        fun showDetailFragment(detailFragment: Class<out Fragment>, arguments: Bundle?)
+    }
 }

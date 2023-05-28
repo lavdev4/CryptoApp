@@ -38,7 +38,7 @@ class CoinDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         Log.d(LOG_DEBUG_TAG, "Created CoinDetailFragment")
-        _binding = FragmentCoinDetailBinding.inflate(layoutInflater)
+        _binding = FragmentCoinDetailBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
