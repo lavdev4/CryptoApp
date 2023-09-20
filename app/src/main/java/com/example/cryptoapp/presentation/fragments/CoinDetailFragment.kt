@@ -13,6 +13,7 @@ import com.example.cryptoapp.presentation.CoinApplication.Companion.LOG_DEBUG_TA
 import com.example.cryptoapp.presentation.MainActivity
 import com.example.cryptoapp.presentation.viewmodels.AppViewModelFactory
 import com.example.cryptoapp.presentation.viewmodels.CoinDetailViewModel
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
@@ -28,8 +29,9 @@ class CoinDetailFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity() as MainActivity).mainActivitySubcomponent.inject(this)
-
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[CoinDetailViewModel::class.java]
+        viewModel =
+            ViewModelProvider(requireActivity(), viewModelFactory)[CoinDetailViewModel::class.java]
+        postponeEnterTransition()
     }
 
     override fun onCreateView(
@@ -46,10 +48,10 @@ class CoinDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (arguments == null || !requireArguments().containsKey(COIN_TO_SHOW)) {
-            parentFragmentManager.popBackStack()
-            return
+            throw RuntimeException("Fragment arguments are null or don't contain required key")
         }
         arguments?.getString(COIN_TO_SHOW)?.let { coin ->
+            _binding?.ivLogoCoin?.transitionName = coin
             viewModel.getDetailInfo(coin).observe(viewLifecycleOwner) {
                 binding.tvPrice.text = it.price
                 binding.tvMinPrice.text = it.lowDay
@@ -58,7 +60,10 @@ class CoinDetailFragment : Fragment() {
                 binding.tvLastUpdate.text = it.lastUpdate
                 binding.tvFromSymbol.text = it.fromSymbol
                 binding.tvToSymbol.text = it.toSymbol
-                Picasso.get().load(it.imageUrl).into(binding.ivLogoCoin)
+                Picasso.get().load(it.imageUrl).into(binding.ivLogoCoin, object : Callback {
+                    override fun onSuccess() { startPostponedEnterTransition() }
+                    override fun onError(e: Exception?) { startPostponedEnterTransition() }
+                })
             }
         }
     }

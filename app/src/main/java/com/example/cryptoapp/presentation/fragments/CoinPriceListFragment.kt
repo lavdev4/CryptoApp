@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +18,7 @@ import com.example.cryptoapp.presentation.adapters.PriceListAdapter
 import com.example.cryptoapp.presentation.viewmodels.AppViewModelFactory
 import com.example.cryptoapp.presentation.viewmodels.CoinPriceListViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,24 +47,26 @@ class CoinPriceListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(LOG_DEBUG_TAG, "Created CoinPriceListFragment")
+        Log.d(LOG_DEBUG_TAG, "CoinPriceListFragment onCreateView")
         _binding = FragmentCoinPriceListBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        postponeEnterTransition()
         val adapter = PriceListAdapter(requireContext())
         adapter.onItemClickListener = setupItemClickListener()
         binding.rvCoinPriceList.adapter = adapter
 
         lifecycleScope.launch {
-            viewModel.priceList.collectLatest {
+            viewModel.priceList.onStart {
+                (view.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
+            }.collectLatest {
                 adapter.submitData(it)
                 Log.d(LOG_DEBUG_TAG, "Adapter update")
             }
         }
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroyView() {
@@ -72,17 +76,22 @@ class CoinPriceListFragment : Fragment() {
 
     private fun setupItemClickListener(): PriceListAdapter.OnItemClickListener {
         return object : PriceListAdapter.OnItemClickListener {
-            override fun onItemClick(coinInfo: CoinInfoEntity) {
+            override fun onItemClick(coinInfo: CoinInfoEntity, itemImage: View) {
                 arguments = CoinDetailFragment.createArguments(coinInfo.fromSymbol)
                 detailFragmentCallListener.showDetailFragment(
                     CoinDetailFragment::class.java,
-                    arguments
+                    arguments,
+                    itemImage
                 )
             }
         }
     }
 
     interface DetailFragmentCallListener {
-        fun showDetailFragment(detailFragment: Class<out Fragment>, arguments: Bundle?)
+        fun showDetailFragment(
+            detailFragment: Class<out Fragment>,
+            arguments: Bundle?,
+            transitionImage: View
+        )
     }
 }
