@@ -4,16 +4,16 @@
 <details>
   <summary><b>🏞️Скриншоты</b></summary>
     <p align="center">
-      <img width="20%" height="20%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/a9d62289-9dbe-404b-89ff-0e5fb88fa7c4">
+      <img width="30%" height="30%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/c26eadba-e8fc-4e7a-8fde-89cdecd08d44">
     </p>
     <p align="center">
-      <img width="20%" height="20%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/7f820b93-a555-4e8b-a19a-751c7e87bfb9">
+      <img width="30%" height="30%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/df509cda-d92c-4123-b329-d6db299ae913">
     </p>
     <p align="center">
-      <img width="40%" height="40%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/3d893c54-1ef0-465e-b36f-867d44bafbc5">
+      <img width="60%" height="60%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/9b0a2580-f49c-4caf-8d02-da5ac54d6a08">
     </p>
     <p align="center">
-      <img width="40%" height="40%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/40cedd67-d4b6-4f63-a308-56e08b0606ce">
+      <img width="60%" height="60%" src="https://github.com/lavdev4/CryptoApp/assets/103329075/6011f349-9465-4ca8-849a-0ba1a58f1d4d">
     </p>
 </details>
 
